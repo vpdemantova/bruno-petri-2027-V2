@@ -289,6 +289,22 @@ ul, ol { list-style: none; }
 .obra-thumb { aspect-ratio: 1; border-radius: 14px; background: #6b6b6b; overflow: hidden; transition: transform .3s var(--ease-out), background .3s; }
 .obra-thumb:hover { transform: translateY(-3px); background: #777; }
 
+/* BP-07: "3D | foto" quando a peça física tem foto (src/data/fotos.ts) */
+.obra-mode { position: absolute; left: 1.2vw; top: 1.2vw; z-index: 3; display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(232, 230, 229, .14); }
+.obra-mode button { padding: 6px 12px; border-radius: 999px; font-size: 13px; color: var(--paper); transition: background .25s, color .25s; }
+.obra-mode button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+.obra-mode ~ .obra-lamp { top: calc(1.2vw + 44px); }
+.obra-foto { position: absolute; inset: 0; z-index: 2; margin: 0; border-radius: inherit; overflow: hidden; background: var(--ink); }
+.obra-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.obra-foto-dots { position: absolute; left: 0; right: 0; bottom: 3.4vh; display: flex; justify-content: center; gap: 8px; }
+.obra-foto-dots button { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--paper); transition: background .2s; }
+.obra-foto-dots button[aria-pressed="true"] { background: var(--paper); }
+
+/* BP-02: a miniatura da obra fotografada (uma <img>, com a margem e a sombra do quadro na parede) */
+.flat-photo { display: grid; place-items: center; padding: 16%; }
+.flat-photo img { max-width: 100%; max-height: 100%; width: auto; height: auto; box-shadow: 0 8px 24px rgba(0, 0, 0, .45); }
+.flat-photo.is-round img { border-radius: 50%; aspect-ratio: 1; object-fit: cover; }
+
 /* ── LOJA ── */
 .pg-loja { overflow-y: auto; }
 .loja-side { position: fixed; left: 0; top: 0; bottom: 0; width: 34vw; color: var(--paper); z-index: 2; }
@@ -386,6 +402,12 @@ ul, ol { list-style: none; }
 .geo-links { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 13px; }
 .geo-links a { display: inline-flex; align-items: center; gap: 6px; color: var(--yellow); }
 .geo-links .disc { width: 14px; color: var(--yellow); --disc-ink: #000; }
+/* BP-06: exposições e acervos */
+.cv { display: grid; border-top: 1px solid #cfccca; margin-top: 4vh; }
+.cv li { display: grid; grid-template-columns: 5.5em 1fr 1fr auto; gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid #cfccca; font-size: var(--body-fs); }
+.cv-ano { font-weight: 600; }
+.cv-lug { color: #555; }
+.cv-tipo { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #555; }
 .sobre-contact { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .sobre-credits { max-width: 1240px; margin: 6vh auto 0; padding: 4vh 5vw 8vh; border-top: 1px solid #cfccca; display: grid; gap: 10px; }
 .sobre-credits p { color: #5a5a5a; font-size: 13px; line-height: 1.6; max-width: 60em; }
@@ -477,6 +499,8 @@ ul, ol { list-style: none; }
   .sobre-sec { padding-top: 8vh; }
   .fam-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .geo-grid { grid-template-columns: 1fr; }
+  .cv li { grid-template-columns: 3.6em 1fr; gap: 4px 12px; }
+  .cv-lug, .cv-tipo { grid-column: 2; }
 }
 
 @media (min-width: 900px) and (min-aspect-ratio: 1/1) and (max-width: 1180px) {

@@ -27,7 +27,7 @@ import {
 } from "three/webgpu";
 import { vec3, mix, positionWorld, smoothstep } from "three/tsl";
 import type { MaterialChoice, Work } from "../data/works";
-import { makePiece } from "./piece";
+import { makePiece, TEXTURE_EVENT } from "./piece";
 import { lampPower } from "./materials";
 import { build } from "./sculptures";
 
@@ -347,6 +347,8 @@ class Engine {
     document.body.appendChild(this.overlay);
     this.octx = this.overlay.getContext("2d")!;
 
+    // a foto de uma obra chega depois do primeiro quadro (BP-02): as vistas paradas se redesenham
+    addEventListener(TEXTURE_EVENT, () => this.slots.forEach((s) => (s.dirty = true)));
     document.documentElement.dataset.gpu = this.backend;
     this.isReady = true;
     this.resolveReady();

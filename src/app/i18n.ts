@@ -40,6 +40,10 @@ export const TXT = {
   lampOn: S("Acender", "Turn on"),
   lampOff: S("Apagar", "Turn off"),
   open: S("Abrir", "Open"),
+  size: S("Tamanho", "Size"),
+  state: S("Situação", "Status"),
+  photo: S("Foto", "Photo"),
+  viewAs: S("Ver em 3D ou na foto", "See in 3D or in the photo"),
   // loja
   shopTitle: S("Loja", "Shop"),
   shopLead: S("Esculturas, luminárias, pinturas e mandalas. Escolha a obra e o material, monte a sua lista e envie ao artista: preço, prazo e entrega são combinados direto com ele.",
@@ -64,6 +68,7 @@ export const TXT = {
   materialsTitle: S("As matérias", "The materials"),
   materialsLead: S("Mármore, madeira, vidro, gesso, metal e laca: cada um com as suas variações. Passe o mouse ou toque para girar.", "Marble, wood, glass, plaster, metal and lacquer, each with its variations. Hover or tap to turn."),
   geometryTitle: S("Geometria e proporção", "Geometry and proportion"),
+  cvTitle: S("Exposições e acervos", "Exhibitions and collections"),
   contact: S("Contato", "Contact"),
   credits: S("Créditos do site", "Site credits"),
   notFound: S("Esta página não existe.", "This page does not exist."),

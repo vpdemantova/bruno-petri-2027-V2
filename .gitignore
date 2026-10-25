@@ -7,3 +7,5 @@ dist
 ref/
 # as fotos dos testes (scripts/fumaca.mjs)
 testes/fotos/
+# os originais das fotos das obras (npm run fotos lê daqui e grava public/obras/)
+media/

@@ -5,7 +5,8 @@
    de material (as seis famílias e as variações) e três vistas da obra. */
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { useMemo, useState } from "react";
-import { WORKS, WORK_BY_SLUG, type Family, type Finish, type MaterialChoice } from "../data/works";
+import { FOTO, fotoSrcset, fotoUrl, fotosDa } from "../data/fotos";
+import { WORKS, WORK_BY_SLUG, mediumOf, type Family, type Finish, type MaterialChoice } from "../data/works";
 import { TXT, useLang } from "../app/i18n";
 import { navigate } from "../app/router";
 import { useStore } from "../app/store";
@@ -28,6 +29,11 @@ export default function Work({ slug }: { slug: string }) {
   const presets = useMemo(() => presetsFor(work), [work]);
   const [angle, setAngle] = useState<Angle | undefined>(undefined);
   const [lamp, setLamp] = useState(1);
+  // BP-07: as fotos da peça física, ao lado do 3D (só aparecem se houver)
+  const fotos = useMemo(() => fotosDa(slug), [slug]);
+  const [fotoAt, setFotoAt] = useState<{ slug: string; i: number } | null>(null);
+  const foto = fotoAt?.slug === slug ? fotoAt.i : null;
+  const setFoto = (i: number | null) => setFotoAt(i === null ? null : { slug, i });
   const at = WORKS.findIndex((w) => w.slug === slug);
   const go = (d: number) => { setAngle(undefined); navigate(`/${WORKS[(at + d + WORKS.length) % WORKS.length].slug}`, { replace: true }); };
   const isLamp = work.category === "luminaria";
@@ -50,6 +56,28 @@ export default function Work({ slug }: { slug: string }) {
           </button>
         )}
         <p className="obra-hint">{mobile ? t(TXT.dragTouch) : t(TXT.drag)}</p>
+        {fotos.length > 0 && (
+          <div className="obra-mode" role="group" aria-label={t(TXT.viewAs)}>
+            <button type="button" aria-pressed={foto === null} onClick={() => setFoto(null)}>3D</button>
+            <button type="button" aria-pressed={foto !== null} onClick={() => setFoto(0)}>{t(TXT.photo)}</button>
+          </div>
+        )}
+        <AnimatePresence>
+          {foto !== null && fotos[foto] && (
+            <motion.figure key="foto" className="obra-foto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35, ease: EASE_OUT }}>
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.img key={fotos[foto]} src={fotoUrl(fotos[foto], 1280)} srcSet={fotoSrcset(fotos[foto])} sizes="(max-width: 899px) 92vw, 35vw"
+                  alt={`${t(work.title)}: ${t(TXT.photo).toLowerCase()} ${foto + 1}`} style={{ background: FOTO[fotos[foto]].cor }}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} />
+              </AnimatePresence>
+              {fotos.length > 1 && (
+                <div className="obra-foto-dots" role="group" aria-label={t(TXT.photo)}>
+                  {fotos.map((f, i) => <button key={f} type="button" aria-pressed={i === foto} aria-label={`${t(TXT.photo)} ${i + 1}`} onClick={() => setFoto(i)} />)}
+                </div>
+              )}
+            </motion.figure>
+          )}
+        </AnimatePresence>
       </motion.section>
 
       <motion.section className="card obra-info" {...rise(1, 0.15)}>
@@ -60,9 +88,9 @@ export default function Work({ slug }: { slug: string }) {
         </div>
         <Swap k={slug + lang + (mat ? mat.variant : "")} as="div">
           <dl className="meta">
-            <div><dt className="sr">{t(TXT.material)}</dt><dd>{mat ? FAMILIES[mat.family].label[lang].toLowerCase() : work.kind.type === "painting" ? (lang === "pt" ? "óleo sobre tela" : "oil on canvas") : (lang === "pt" ? "nanquim e ouro" : "ink and gold")}</dd></div>
-            <div><dt className="sr">size</dt><dd>{work.size}</dd></div>
-            <div><dt className="sr">status</dt><dd>{status}</dd></div>
+            <div><dt className="sr">{t(TXT.material)}</dt><dd>{mat ? FAMILIES[mat.family].label[lang].toLowerCase() : mediumOf(work)?.[lang] ?? ""}</dd></div>
+            <div><dt className="sr">{t(TXT.size)}</dt><dd>{work.dims ?? work.size}</dd></div>
+            <div><dt className="sr">{t(TXT.state)}</dt><dd>{status}</dd></div>
           </dl>
           <p className="meta-series">{t(work.series)}{work.origin === "estudo" && <span className="tag-study">{t(TXT.study)}</span>}</p>
         </Swap>

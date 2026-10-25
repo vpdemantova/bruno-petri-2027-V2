@@ -36,7 +36,9 @@ export type GenId =
 export type Kind =
   | { type: "sculpture"; gen: GenId }
   | { type: "painting"; style: "campos" | "geometria" | "gestos" | "horizonte" | "radial"; seed: number; w: number; h: number; round?: boolean }
-  | { type: "mandala"; seed: number; folds: number };
+  | { type: "mandala"; seed: number; folds: number }
+  /** uma obra plana fotografada (BP-02): src é o nome em src/data/fotos.json (npm run fotos); w e h em centímetros */
+  | { type: "photo"; src: string; w: number; h: number; round?: boolean; paper?: boolean };
 
 export interface Work {
   slug: string;
@@ -49,6 +51,10 @@ export interface Work {
   families?: Family[];
   /** o tamanho (o maior lado), como nas telas: "1.2m" */
   size: string;
+  /** as medidas exatas, quando o artista disser (BP-05): "120 × 120 × 30 cm" */
+  dims?: string;
+  /** a técnica, nas palavras do artista (BP-05): "óleo sobre tela", "mármore Bardiglio" */
+  medium?: T;
   origin: "obra" | "estudo";
   status: "disponivel" | "consulta" | "estudo";
   text: Record<Lang, string[]>;
@@ -358,3 +364,11 @@ export const FAMILY_LABEL: Record<Family, T> = {
   metal: S("metal", "metal"),
   laca: S("laca", "lacquer"),
 };
+
+/** a técnica da obra plana, para a ficha e a loja: a do artista, quando houver (BP-05); senão, a do desenho gerado */
+export function mediumOf(w: Work): T | null {
+  if (w.medium) return w.medium;
+  if (w.kind.type === "painting") return S("óleo sobre tela", "oil on canvas");
+  if (w.kind.type === "mandala") return w.kind.seed % 2 ? S("ouro sobre preto", "gold on black") : S("nanquim sobre papel", "ink on paper");
+  return null;
+}

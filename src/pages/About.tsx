@@ -37,6 +37,8 @@ export default function About() {
         </div>
       </header>
 
+      {ARTIST.cv.length > 0 && <CvSection />}
+
       <section className="sobre-sec" aria-labelledby="h-mat">
         <Reveal><h2 id="h-mat" className="h-sec"><Swap k={lang}>{t(TXT.materialsTitle)}</Swap></h2></Reveal>
         <Reveal><p className="sec-lead">{t(TXT.materialsLead)}</p></Reveal>
@@ -82,6 +84,35 @@ export default function About() {
           : "3D sculptures generated in code (three.js with WebGPU, WebGL2 fallback); materials computed from position, no photos. Typefaces: Syne, Lexend and Cormorant Garamond (SIL Open Font License). Forms marked as studies, and the generated paintings and mandalas, stand in for the artist's works until replaced by photographs."}</p>
       </footer>
     </motion.main>
+  );
+}
+
+/* ── BP-06: exposições, prêmios e acervos (só aparece quando o Bruno confirmar e a lista em artist.ts tiver linhas) ── */
+const CV_TIPO = {
+  individual: { pt: "individual", en: "solo show" },
+  coletiva: { pt: "coletiva", en: "group show" },
+  premio: { pt: "prêmio", en: "award" },
+  acervo: { pt: "acervo", en: "collection" },
+};
+function CvSection() {
+  const [lang, t] = useLang();
+  const rows = [...ARTIST.cv].sort((a, b) => b.ano - a.ano);
+  return (
+    <section className="sobre-sec" aria-labelledby="h-cv">
+      <Reveal><h2 id="h-cv" className="h-sec">{t(TXT.cvTitle)}</h2></Reveal>
+      <Reveal>
+        <ol className="cv">
+          {rows.map((r, i) => (
+            <li key={i}>
+              <span className="cv-ano">{r.ano}</span>
+              <span className="cv-tit">{r.titulo[lang]}</span>
+              <span className="cv-lug">{[r.lugar, r.cidade].filter(Boolean).join(", ")}</span>
+              <span className="cv-tipo">{CV_TIPO[r.tipo][lang]}</span>
+            </li>
+          ))}
+        </ol>
+      </Reveal>
+    </section>
   );
 }
 

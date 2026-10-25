@@ -28,4 +28,12 @@ export const ARTIST = {
     pt: "Artista plástico, arte geométrica e transcendental. Formado em Artes Visuais pela Unicamp em 1996.",
     en: "Visual artist, geometric and transcendental art. Graduated in Visual Arts from Unicamp in 1996.",
   } as T,
+  /**
+   * BP-06: exposições, prêmios e acervos, com ano e lugar. Só o que o Bruno
+   * confirmar; vazio, a seção não aparece na página Sobre. Exemplo de linha:
+   * { ano: 2019, tipo: "individual", titulo: { pt: "…", en: "…" }, lugar: "…", cidade: "Campinas" }
+   */
+  cv: [] as CvItem[],
 };
+
+export interface CvItem { ano: number; tipo: "individual" | "coletiva" | "premio" | "acervo"; titulo: T; lugar: string; cidade: string }

@@ -1,8 +1,12 @@
-/* Miniatura de uma obra plana (pintura ou mandala): a imagem gerada,
-   desenhada num canvas. Gerar uma pintura custa ~0,1 s, por isso as
-   miniaturas entram numa fila e saem uma por vez, nos intervalos livres. */
+/* Miniatura de uma obra plana (pintura ou mandala).
+   · Gerada: a imagem desenhada num canvas. Gerar uma pintura custa ~0,1 s,
+     por isso as miniaturas entram numa fila e saem uma por vez, nos
+     intervalos livres.
+   · Fotografada (BP-02, 25/out/2026): uma <img> com srcset, que o
+     navegador carrega na largura certa e só quando aparece. */
 import { useEffect, useRef, useState } from "react";
 import type { Work } from "../data/works";
+import { FOTO, fotoSrcset, fotoUrl } from "../data/fotos";
 import { flatFor, type Flat } from "../three/flat";
 import { useLang } from "../app/i18n";
 
@@ -25,6 +29,23 @@ export function whenFlat(w: Work, cb: (f: Flat) => void) {
 }
 
 export function FlatThumb({ work, className = "" }: { work: Work; className?: string }) {
+  return work.kind.type === "photo" ? <PhotoThumb work={work} className={className} /> : <DrawnThumb work={work} className={className} />;
+}
+
+function PhotoThumb({ work, className }: { work: Work; className: string }) {
+  const [lang] = useLang();
+  const [ready, setReady] = useState(false);
+  if (work.kind.type !== "photo") return null;
+  const k = work.kind, f = FOTO[k.src];
+  return (
+    <span className={`piece3d flat-thumb flat-photo ${ready ? "is-ready" : ""} ${k.round ? "is-round" : ""} ${className}`}>
+      <img src={fotoUrl(k.src, 640)} srcSet={fotoSrcset(k.src)} sizes="(max-width: 899px) 50vw, 22vw" width={f?.w} height={f?.h}
+        alt={work.title[lang]} loading="lazy" decoding="async" onLoad={() => setReady(true)} style={{ background: f?.cor }} />
+    </span>
+  );
+}
+
+function DrawnThumb({ work, className }: { work: Work; className: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
   const [lang] = useLang();

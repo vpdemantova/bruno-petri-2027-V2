@@ -92,8 +92,8 @@ export default function Spyglass({ slug }: { slug: string }) {
             </div>
             <dl className="meta">
               {mat && <div><dt className="sr">{t(TXT.material)}</dt><dd>{materialLabel(mat, lang).split(" · ")[0]}</dd></div>}
-              <div><dt className="sr">size</dt><dd>{work.size}</dd></div>
-              <div><dt className="sr">status</dt><dd>{work.status === "disponivel" ? t(TXT.available) : work.status === "consulta" ? t(TXT.consult) : t(TXT.study)}</dd></div>
+              <div><dt className="sr">{t(TXT.size)}</dt><dd>{work.dims ?? work.size}</dd></div>
+              <div><dt className="sr">{t(TXT.state)}</dt><dd>{work.status === "disponivel" ? t(TXT.available) : work.status === "consulta" ? t(TXT.consult) : t(TXT.study)}</dd></div>
             </dl>
             <p className="meta-series">{t(work.series)}</p>
             <Swap k={slug + lang} as="p" className="spy-card-text">{work.text[lang][0]}</Swap>

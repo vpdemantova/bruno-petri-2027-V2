@@ -2,18 +2,24 @@
    A PEÇA: monta o objeto 3D de uma obra (escultura, luminária, pintura ou
    mandala) com o material escolhido. Os objetos são baratos (geometria e
    material são compartilhados); cada vista da página ganha o seu.
+   Desde 25/out/2026 (BP-02), a obra plana pode ser uma foto de verdade:
+   a foto vira a frente do quadro, e o lado e a espessura continuam.
 ════════════════════════════════════════════════════════════════════ */
 import {
   BoxGeometry, CanvasTexture, Color, CylinderGeometry, Group, Mesh, MeshPhysicalNodeMaterial, SRGBColorSpace,
-  Sprite, SpriteNodeMaterial, LinearSRGBColorSpace, Object3D, AdditiveBlending,
+  Sprite, SpriteNodeMaterial, LinearSRGBColorSpace, Object3D, AdditiveBlending, TextureLoader,
 } from "three/webgpu";
 import { bumpMap, texture, float, vec3, uv, length, pow, max, mix } from "three/tsl";
 import type { MaterialChoice, Work } from "../data/works";
+import { FOTO, fotoUrl } from "../data/fotos";
 import { build } from "./sculptures";
 import { glowMaterial, lampPower, makeMaterial } from "./materials";
 import { flatFor } from "./flat";
 
 export const defaultMaterial = (w: Work): MaterialChoice => w.material ?? { family: "marmore", variant: "bardiglio" };
+
+/** quando uma textura chega depois (a foto de uma obra), o motor redesenha as vistas paradas */
+export const TEXTURE_EVENT = "bp-textura";
 
 let glowMat: ReturnType<typeof glowMaterial> | null = null;
 let haloMat: SpriteNodeMaterial | null = null;
@@ -33,9 +39,25 @@ function halo() {
 const flatMats = new Map<string, MeshPhysicalNodeMaterial>();
 const sideMat = new MeshPhysicalNodeMaterial({ color: new Color("#d6ccb9"), roughness: 0.9 });
 
+/** a frente de uma obra fotografada: a foto maior (2400 px), que chega depois do primeiro quadro */
+function photoFront(src: string): MeshPhysicalNodeMaterial {
+  const tex = new TextureLoader().load(fotoUrl(src, 2400), () => dispatchEvent(new Event(TEXTURE_EVENT)));
+  tex.colorSpace = SRGBColorSpace;
+  tex.anisotropy = 8;
+  // o verniz de uma pintura: um brilho leve por cima, sem inventar relevo
+  const m = new MeshPhysicalNodeMaterial({ roughness: 0.6, metalness: 0, clearcoat: 0.15, clearcoatRoughness: 0.4 });
+  m.colorNode = texture(tex);
+  return m;
+}
+
 function flatFront(w: Work): MeshPhysicalNodeMaterial {
   const hit = flatMats.get(w.slug);
   if (hit) return hit;
+  if (w.kind.type === "photo") {
+    const m = photoFront(w.kind.src);
+    flatMats.set(w.slug, m);
+    return m;
+  }
   const f = flatFor(w.kind as never);
   const ct = new CanvasTexture(f.color);
   ct.colorSpace = SRGBColorSpace;
@@ -62,6 +84,16 @@ function flatFront(w: Work): MeshPhysicalNodeMaterial {
   return m;
 }
 
+/** a proporção da obra plana: a da foto (em pixels), a do desenho gerado ou a das medidas */
+export function flatAspect(w: Work): number {
+  const k = w.kind;
+  if (k.type === "photo") {
+    const f = FOTO[k.src];
+    return f ? f.w / f.h : k.w / k.h;
+  }
+  return flatFor(k as never).aspect;
+}
+
 export function makePiece(w: Work, choice?: MaterialChoice): Object3D {
   const g = new Group();
   g.name = w.slug;
@@ -83,18 +115,20 @@ export function makePiece(w: Work, choice?: MaterialChoice): Object3D {
       g.userData.lamp = true;
     }
   } else {
-    const f = flatFor(w.kind as never);
     const front = flatFront(w);
-    const k = 2 / Math.hypot(f.aspect, 1); // a diagonal vale 2: raio 1, como as esculturas
-    const W = f.aspect * k, H = k;
-    if (w.kind.type === "painting" && w.kind.round) {
+    const aspect = flatAspect(w);
+    const k = 2 / Math.hypot(aspect, 1); // a diagonal vale 2: raio 1, como as esculturas
+    const W = aspect * k, H = k;
+    const round = (w.kind.type === "painting" || w.kind.type === "photo") && w.kind.round;
+    if (round) {
       const geo = new CylinderGeometry(W / 2, W / 2, 0.06, 96, 1);
       geo.rotateX(Math.PI / 2);
       const mesh = new Mesh(geo, [sideMat, front, sideMat]);
       mesh.castShadow = mesh.receiveShadow = true;
       g.add(mesh);
     } else {
-      const d = w.kind.type === "painting" ? 0.07 : 0.035;
+      // a tela no chassi tem uns 4 cm de espessura; o papel, quase nada
+      const d = w.kind.type === "painting" ? 0.07 : w.kind.type === "photo" ? (w.kind.paper ? 0.014 : 0.07) : 0.035;
       const mesh = new Mesh(new BoxGeometry(W, H, d), [sideMat, sideMat, sideMat, sideMat, front, sideMat]);
       mesh.castShadow = mesh.receiveShadow = true;
       g.add(mesh);

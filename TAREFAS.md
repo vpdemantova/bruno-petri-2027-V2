@@ -55,18 +55,13 @@
   - A pergunta para ele: quais estudos ficam, quais saem e quais ele quer fazer de verdade.
   - A situação de cada uma também é palpite. Só a Cruz Fractal está "disponível", porque a tela diz; as outras três estão "sob consulta".
 
+  - *25/out/2026:* a mensagem pronta para mandar a ele, com todas as perguntas, está em `PERGUNTAS-AO-BRUNO.md`.
+
   *Prompt:* "faz a BP-01: o Bruno confirmou [lista]; tira [lista]; a situação de cada uma é [lista]."
-- [ ] **BP-02** · [P1 · média] **As pinturas e mandalas de verdade.** As 8 pinturas e as 4 mandalas são geradas por código, no lugar das dele.
-  - Com as fotos: um tipo novo `kind: { type: "photo", src, w, h }`. A foto vira a textura do quadro 3D (a moldura e a profundidade continuam) e a miniatura da grade.
-  - As fotos ficam em `public/obras/`, em WebP de até 2400 px.
-  - *Sugestão de código* (em `piece.ts`):
-    ```ts
-    if (w.kind.type === "photo") {
-      const tex = await new TextureLoader().loadAsync(w.kind.src);
-      tex.colorSpace = SRGBColorSpace;
-      front.colorNode = texture(tex);
-    }
-    ```
+- [~] **BP-02** · [P1 · média] **As pinturas e mandalas de verdade.** As 8 pinturas e as 4 mandalas são geradas por código, no lugar das dele. *25/out/2026: o caminho está pronto; faltam as fotos.*
+  - **Como entra uma foto:** o arquivo em `media/obras/<endereço>.jpg` (o nome é o endereço da obra, sem acento: `media/obras/sol-de-dentro.jpg`), depois `npm run fotos`. O roteiro (`scripts/fotos.mjs`, com o sharp) gira pela orientação da câmera, converte para sRGB e grava `public/obras/<nome>-640.webp`, `-1280` e `-2400` (nunca maior que o original), mais as medidas e a cor média em `src/data/fotos.json`. Só refaz o que mudou. A pasta `media/` fica fora do git (os originais são pesados).
+  - **Na obra** (`src/data/works.ts`): `kind: { type: "photo", src: "sol-de-dentro", w: 80, h: 100 }` (w e h em cm; `round: true` para tela redonda, `paper: true` para papel). No 3D, a foto vira a frente do quadro, com o lado e a espessura de sempre (`src/three/piece.ts`); na grade e na loja, uma `<img>` com `srcset`, que o navegador carrega na largura certa e só quando aparece (`src/ui/FlatThumb.tsx`).
+  - Conferido em 25/out com uma foto de teste: a grade, a página da obra e o 3D (depois tirada).
 
   *Prompt:* "faz a BP-02 com estas fotos: [anexos, com nome, ano, técnica e medidas de cada uma]."
 - [ ] **BP-03** · [P1 · pequena] **E-mail e Instagram do Bruno.**
@@ -78,9 +73,12 @@
 
   *Prompt:* "faz a BP-03: e-mail [x], Instagram [y]."
 - [ ] **BP-04** · [P2 · média] **Os textos dele.** Hoje o texto de cada obra descreve a forma. O ideal é a voz do artista: a intenção, a história, o processo. Mande o texto de cada uma, mesmo em rascunho, que eu ajusto e traduzo.
-- [ ] **BP-05** · [P2 · pequena] **Medidas e materiais reais.** O tamanho ("1.2m") e o material de cada peça.
-- [ ] **BP-06** · [P2 · média] **Bio completa.** Exposições, prêmios e acervos, com ano e lugar. Só entra o que ele confirmar.
-- [ ] **BP-07** · [P3 · média] **Foto ao lado do 3D.** Na página da obra, um botão "foto | 3D" para comparar a peça física com o modelo.
+  *Prompt:* "faz a BP-04: o texto da Cruz Fractal é […]; o da Molécula é […]."
+- [~] **BP-05** · [P2 · pequena] **Medidas e materiais reais.** *25/out/2026: os campos existem; faltam os dados.* Cada obra aceita `dims` (as medidas exatas, "120 × 120 × 30 cm", que aparecem no lugar do "1.2m" na ficha e no Spyglass) e `medium` (a técnica nas palavras dele: "óleo sobre tela", "mármore Bardiglio"). Sem `medium`, a obra plana mostra a técnica do desenho gerado (óleo sobre tela; ouro sobre preto), num lugar só (`mediumOf` em `src/data/works.ts`), que antes dizia coisas diferentes na ficha e na loja.
+  *Prompt:* "faz a BP-05: Cruz Fractal 120 × 120 × 30 cm, mármore Bardiglio; …"
+- [~] **BP-06** · [P2 · média] **Bio completa.** Exposições, prêmios e acervos, com ano e lugar. Só entra o que ele confirmar. *25/out/2026: a seção "Exposições e acervos" da página Sobre está pronta e escondida:* aparece sozinha quando a lista `cv` em `src/data/artist.ts` tiver linhas (ano, tipo, título nas duas línguas, lugar e cidade; a mais recente primeiro). Conferida com duas linhas de teste em 1440 e 390 px.
+  *Prompt:* "faz a BP-06: 2019, individual, [título], [lugar], [cidade]; …"
+- [~] **BP-07** · [P3 · média] **Foto ao lado do 3D.** *25/out/2026: pronta; falta a foto.* Uma foto em `media/obras/cruz-fractal--1.jpg` (e `--2`, `--3`… para mais), depois `npm run fotos`, e a página da obra ganha "3D | Foto" no canto do cartão, com pontos para trocar de foto. Sem foto, nada aparece. Conferida com duas fotos de teste e o mouse de verdade.
 
 ## 3. Design e interface (fidelidade às telas)
 

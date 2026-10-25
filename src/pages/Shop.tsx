@@ -5,7 +5,7 @@
    dele não estiver publicado). Nada de preço inventado. */
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CATEGORIES, WORKS, WORK_BY_SLUG, lightCard, type Category, type Work } from "../data/works";
+import { CATEGORIES, WORKS, WORK_BY_SLUG, lightCard, mediumOf, type Category, type Work } from "../data/works";
 import { ARTIST } from "../data/artist";
 import { TXT, useLang } from "../app/i18n";
 import { useRoute } from "../app/router";
@@ -98,7 +98,7 @@ function Product({ work, i }: { work: Work; i: number }) {
         <h2 className="prod-name">{t(work.title)}</h2>
         <p className="prod-meta"><span>{t(work.series)}</span><span>{work.size}</span></p>
         <p className="prod-mat">
-          {mat ? <Swap k={materialLabel(mat, lang)}>{materialLabel(mat, lang)}</Swap> : <span>{work.kind.type === "painting" ? (lang === "pt" ? "óleo sobre tela" : "oil on canvas") : (lang === "pt" ? "desenho a compasso" : "compass drawing")}</span>}
+          {mat ? <Swap k={materialLabel(mat, lang)}>{materialLabel(mat, lang)}</Swap> : <span>{mediumOf(work)?.[lang] ?? ""}</span>}
         </p>
         <div className="prod-row">
           <span className="prod-price">{t(TXT.priceNote)}</span>
