@@ -83,12 +83,28 @@ export function box(w: number, h: number, d: number): BufferGeometry {
   return g;
 }
 
-/** caixa de seção s×s entre dois pontos (uma barra), com sobra nas pontas */
-export function bar(a: Vector3, b: Vector3, s: number, extend = 0, roll = 0): Part {
+/**
+ * caixa de seção s×s entre dois pontos (uma barra), com sobra nas pontas.
+ * `face`: para onde uma das faces olha (ex.: para fora, a partir do centro
+ * da forma). Sem ela, o giro da seção em volta da barra sai do
+ * setFromUnitVectors e muda de barra para barra, o que quebra a simetria
+ * (o teste das formas espelhadas pegou isso no Dodecaedro em 25/out/2026).
+ */
+export function bar(a: Vector3, b: Vector3, s: number, extend = 0, roll = 0, face?: Vector3): Part {
   const dir = tmpV.copy(b).sub(a);
   const len = dir.length();
   const mid = a.clone().add(b).multiplyScalar(0.5);
-  const q = new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), dir.normalize());
+  const y = dir.normalize().clone();
+  if (face) {
+    const z = face.clone().sub(y.clone().multiplyScalar(face.dot(y)));
+    if (z.lengthSq() > 1e-10) {
+      z.normalize();
+      const x = new Vector3().crossVectors(y, z);
+      const m = new Matrix4().makeBasis(x, y, z).setPosition(mid).multiply(M.ry(roll));
+      return part(box(s, len + extend, s), m);
+    }
+  }
+  const q = new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), y);
   const m = new Matrix4().compose(mid, q, new Vector3(1, 1, 1)).multiply(M.ry(roll));
   return part(box(s, len + extend, s), m);
 }

@@ -1,6 +1,8 @@
-# Bruno Petri — tarefas, prompts, controles e melhorias
+# Bruno Petri V2 — tarefas, prompts, controles e melhorias
 
-> O painel de trabalho deste projeto. Você acrescenta, eu faço, e os dois vamos riscando. Criado em 11/out/2026. O que já existe e como roda está no `README.md`; aqui fica o que vem depois.
+> O painel de trabalho deste projeto. Você acrescenta, eu faço, e os dois vamos riscando. Criado em 11/out/2026 na V1; a **V2** (esta pasta, `D:\www\bruno-petri-2027-V2`) nasceu em 25/out/2026 como cópia da V1, com o histórico do git, para passar por todos os itens daqui, um por um. O que existe e como roda está no `README.md`; aqui fica o que foi feito, o que falta e como pedir.
+
+**Código:** https://github.com/vpdemantova/bruno-petri-2027-V2 (público, como o da V1) · **No ar:** ainda não (ver a BP-80: só com o "pode" seu e do Bruno) · **A V1** continua intacta em `D:\www\bruno-petri-2027`.
 
 ## Como usar
 
@@ -133,7 +135,9 @@
 
 ## 9. Código e organização
 
-- [ ] **BP-70** · [P2 · pequena] **Testes da geometria.** Um teste em Node que gera cada escultura e confere: número de triângulos, simetria (espelhar não muda a caixa) e o raio 1. Evita quebrar uma forma sem ver.
+- [x] **BP-70** · [P2 · pequena] **Testes da geometria.** *25/out/2026.* `npm test` (Vitest) gera cada uma das 21 formas no Node e confere: triângulos, nenhum número inválido, normais de comprimento 1, o centro na origem e o raio 1; as formas espelhadas (Cruz Fractal, Molécula, Ninho, Hipercubo, Dodecaedro) procuram o espelho de cada vértice; e a contagem de triângulos de cada forma fica guardada em `src/three/__snapshots__/` (mudou uma forma de propósito? `npx vitest run -u` e conferir a diferença no git). Também o catálogo (`src/data/works.test.ts`): endereços únicos, as duas línguas, material padrão válido, "estudo é estudo", e cada endereço do site.
+  - **O teste já achou um defeito:** no Dodecaedro, a seção quadrada de cada barra girava de um jeito (o giro saía do `setFromUnitVectors`), e a forma não era simétrica de verdade. Agora `bar()` aceita a direção de uma face (`src/three/geometry.ts`): as barras do Dodecaedro, da Estrela Tetraédrica, do Prisma e do Hipercubo olham para fora, todas iguais.
+- [x] **BP-72** · [P1 · pequena] **Uma conferência só: `npm run check`.** *25/out/2026.* Tipos (`tsc`), lint (`eslint .`, as regras recomendadas e as dos hooks do React, `eslint.config.js`) e testes, numa linha. Roda também no GitHub a cada envio (`.github/workflows/ci.yml`, aba Actions) e na Vercel antes de publicar (`vercel.json`, que já tem o cache longo dos arquivos com hash).
 - [ ] **BP-71** · [P3 · pequena] **Repartir o `ui/kit.tsx`** em arquivos (Nav, LangSwitch, Dropdown…) quando crescer.
 
 ## 10. Publicação

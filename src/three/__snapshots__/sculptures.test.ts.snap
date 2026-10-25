@@ -1,0 +1,27 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`as esculturas > a contagem de triângulos de cada forma (avisa se uma forma mudar) 1`] = `
+{
+  "amostra": 12,
+  "arcos": 3100,
+  "coluna-aurea": 276,
+  "coroa": 6400,
+  "cruz-fractal": 216,
+  "dodecaedro": 760,
+  "esfera-armilar": 9900,
+  "espiral-aurea": 432,
+  "estrela-tetraedrica": 304,
+  "flor-da-vida": 8704,
+  "halo": 3084,
+  "hipercubo": 384,
+  "lanterna-cubica": 192,
+  "mandala-cubica": 396,
+  "molecula": 612,
+  "ninho": 324,
+  "octaedro-estrelado": 8,
+  "portal": 132,
+  "prisma": 196,
+  "torre-raiz2": 624,
+  "triade": 36,
+}
+`;

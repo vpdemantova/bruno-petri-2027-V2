@@ -145,7 +145,7 @@ function estrelaTetraedrica(): Built {
   const t1 = [V(a, a, a), V(a, -a, -a), V(-a, a, -a), V(-a, -a, a)];
   const t2 = t1.map((p) => p.clone().negate());
   const parts: Part[] = [];
-  for (const t of [t1, t2]) for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) parts.push(bar(t[i], t[j], 0.11, 0.11));
+  for (const t of [t1, t2]) for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) parts.push(bar(t[i], t[j], 0.11, 0.11, 0, t[i].clone().add(t[j])));
   parts.push(...nodes([...t1, ...t2], 0.13));
   return { main: merge(xf(parts, upFrom(V(1, 1, 1)))) };
 }
@@ -169,7 +169,7 @@ function dodecaedro(): Built {
   const edge = 2 / PHI;
   const parts: Part[] = [];
   for (let i = 0; i < vs.length; i++) for (let j = i + 1; j < vs.length; j++) {
-    if (Math.abs(vs[i].distanceTo(vs[j]) - edge) < 1e-3) parts.push(bar(vs[i], vs[j], 0.085, 0.04));
+    if (Math.abs(vs[i].distanceTo(vs[j]) - edge) < 1e-3) parts.push(bar(vs[i], vs[j], 0.085, 0.04, 0, vs[i].clone().add(vs[j])));
   }
   parts.push(...nodes(vs, 0.1));
   return { main: merge(parts) };
@@ -228,7 +228,7 @@ function hipercubo(): Built {
   const S = 2, s = 0.9, t = 0.11;
   const parts: Part[] = [...cubeEdges(S, t), ...cubeEdges(s, t * 0.8)];
   for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) {
-    parts.push(bar(V(x, y, z).multiplyScalar(s / 2), V(x, y, z).multiplyScalar(S / 2), t * 0.75));
+    parts.push(bar(V(x, y, z).multiplyScalar(s / 2), V(x, y, z).multiplyScalar(S / 2), t * 0.75, 0, 0, V(0, y, 0)));
   }
   return { main: merge(parts), views: [{ theta: 0.62, phi: 1.12 }] };
 }
@@ -308,9 +308,12 @@ function prisma(): Built {
   const base = [V(-s, 0, -s), V(s, 0, -s), V(s, 0, s), V(-s, 0, s)];
   const apex = V(0, h, 0);
   const parts: Part[] = [];
+  // as faces das barras olham para fora, a partir do centro da pirâmide
+  const mid = V(0, h / 4, 0);
+  const out = (p: Vector3, q: Vector3) => p.clone().add(q).multiplyScalar(0.5).sub(mid);
   for (let i = 0; i < 4; i++) {
-    parts.push(bar(base[i], base[(i + 1) % 4], t, t));
-    parts.push(bar(base[i], apex, t, t * 0.5));
+    parts.push(bar(base[i], base[(i + 1) % 4], t, t, 0, out(base[i], base[(i + 1) % 4])));
+    parts.push(bar(base[i], apex, t, t * 0.5, 0, out(base[i], apex)));
   }
   parts.push(...nodes([...base, apex], 0.075));
   const glow = octahedron(0.36).clone().applyMatrix4(M.t(0, 0.46, 0));

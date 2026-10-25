@@ -1,35 +1,10 @@
-/* Um roteador pequeno sobre a History API. Endereços como nas telas:
-     /                    Home
-     /spyglass/:obra      a obra sozinha, de todos os ângulos
-     /galeria             lista (carrossel); ?vista=grade e ?tipo=pintura…
-     /loja  /sobre
-     /:obra               a página da obra (ex.: /cruz-fractal)
-   O vercel.json manda todo endereço para o index.html. */
+/* Um roteador pequeno sobre a History API. A leitura dos endereços mora em
+   routes.ts (pura, testada no Node); aqui ficam a navegação e o hook.
+   O vercel.json manda todo endereço sem arquivo para o index.html. */
 import { useSyncExternalStore } from "react";
-import { WORK_BY_SLUG } from "../data/works";
+import { parse, type Route } from "./routes";
 
-export type Route =
-  | { name: "home" }
-  | { name: "spyglass"; slug: string }
-  | { name: "galeria"; view: "lista" | "grade" }
-  | { name: "obra"; slug: string }
-  | { name: "loja" }
-  | { name: "sobre" }
-  | { name: "404" };
-
-export function parse(path: string, search = ""): Route {
-  const p = path.replace(/\/+$/, "") || "/";
-  const q = new URLSearchParams(search);
-  if (p === "/") return { name: "home" };
-  if (p === "/galeria" || p === "/gallery") return { name: "galeria", view: q.get("vista") === "grade" || q.get("view") === "grid" ? "grade" : "lista" };
-  if (p === "/loja" || p === "/shop") return { name: "loja" };
-  if (p === "/sobre" || p === "/about") return { name: "sobre" };
-  const sp = p.match(/^\/spyglass(?:\/([\w-]+))?$/);
-  if (sp) return { name: "spyglass", slug: sp[1] && WORK_BY_SLUG[sp[1]] ? sp[1] : "molecula" };
-  const ob = p.match(/^\/([\w-]+)$/);
-  if (ob && WORK_BY_SLUG[ob[1]]) return { name: "obra", slug: ob[1] };
-  return { name: "404" };
-}
+export { parse, type Route };
 
 let current = { path: location.pathname, search: location.search, route: parse(location.pathname, location.search) };
 const subs = new Set<() => void>();

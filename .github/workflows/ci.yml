@@ -1,0 +1,19 @@
+# A conferência no GitHub a cada envio (BP-72, 25/out/2026).
+# De onde veio: a do Vitor Petri V2 (VP-74/VP-98), que roda o mesmo que a
+# Vercel roda antes de publicar (vercel.json: npm run check).
+# Para onde vai: a aba Actions do repositório mostra um x vermelho no envio
+# que quebrar os tipos, o lint, os testes ou o build.
+name: Conferência
+on: [push, pull_request]
+jobs:
+  conferir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
